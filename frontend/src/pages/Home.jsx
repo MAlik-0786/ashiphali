@@ -1,8 +1,93 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { HiArrowRight, HiCode, HiLightningBolt } from 'react-icons/hi'
 import { portfolioData } from '../data/portfolioData'
+import api from '../utils/api'
 
 const Home = () => {
+    const [featuredProjects, setFeaturedProjects] = useState([])
+    const [skills, setSkills] = useState([])
+    const [stats, setStats] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [projectsRes, skillsRes, statsRes] = await Promise.all([
+                    api.get('/api/projects'),
+                    api.get('/api/skills'),
+                    api.get('/api/stats')
+                ])
+
+                const projects = projectsRes.data.data || []
+                const featured = projects.filter(p => p.featured)
+
+                // Logic: Show featured projects if any, else show latest 2 projects, 
+                // else show fallback static projects
+                let projectsToShow = []
+                if (featured.length > 0) {
+                    projectsToShow = featured.slice(0, 3)
+                } else if (projects.length > 0) {
+                    projectsToShow = projects.slice(0, 3)
+                } else {
+                    projectsToShow = portfolioData.projects.slice(0, 3)
+                }
+
+                setFeaturedProjects(projectsToShow)
+
+                const remoteSkills = skillsRes.data.data || []
+                const featuredSkills = remoteSkills.filter(s => s.featured)
+                const otherSkills = remoteSkills.filter(s => !s.featured)
+
+                // Combine: Featured first, then others
+                let combinedSkills = [...featuredSkills, ...otherSkills]
+
+                // If we have fewer than 8, fill with static ones that aren't already included by name
+                if (combinedSkills.length < 8) {
+                    const staticSkills = portfolioData.projects.flatMap(p => p.tech || [])
+                        .filter((v, i, a) => a.indexOf(v) === i) // Unique
+                        .filter(name => !combinedSkills.some(s => s.name.toLowerCase() === name.toLowerCase()))
+                        .map(name => ({ name, _id: name }))
+
+                    combinedSkills = [...combinedSkills, ...staticSkills].slice(0, 8)
+                } else {
+                    combinedSkills = combinedSkills.slice(0, 8)
+                }
+
+                setSkills(combinedSkills)
+
+                const remoteStats = statsRes.data.data || []
+                if (remoteStats.length > 0) {
+                    setStats(remoteStats)
+                } else {
+                    setStats([
+                        { label: 'Projects', value: portfolioData.stats.projectsCompleted },
+                        { label: 'Experience', value: portfolioData.stats.yearsExperience },
+                        { label: 'Clients', value: portfolioData.stats.happyClients },
+                        { label: 'Technologies', value: portfolioData.stats.technologies }
+                    ])
+                }
+            } catch (err) {
+                console.error('Error fetching home data:', err)
+                // Fallback to static data
+                setFeaturedProjects(portfolioData.projects.slice(0, 3))
+                const staticSkills = portfolioData.projects.flatMap(p => p.tech || [])
+                    .filter((v, i, a) => a.indexOf(v) === i)
+                    .map(name => ({ name, _id: name }))
+                setSkills(staticSkills.slice(0, 8))
+                setStats([
+                    { label: 'Projects', value: portfolioData.stats.projectsCompleted },
+                    { label: 'Experience', value: portfolioData.stats.yearsExperience },
+                    { label: 'Clients', value: portfolioData.stats.happyClients },
+                    { label: 'Technologies', value: portfolioData.stats.technologies }
+                ])
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
@@ -34,7 +119,7 @@ const Home = () => {
                         <div className="flex flex-wrap gap-4">
                             <Link
                                 to="/projects"
-                                className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-green-400 text-dark-900 font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                                className="group inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-primary to-green-400 text-dark-900 font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
                             >
                                 View My Work
                                 <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -49,22 +134,12 @@ const Home = () => {
 
                         {/* Stats */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-white/10">
-                            <div>
-                                <div className="text-3xl font-bold text-gradient">{portfolioData.stats.projectsCompleted}</div>
-                                <div className="text-sm text-gray-500 mt-1">Projects</div>
-                            </div>
-                            <div>
-                                <div className="text-3xl font-bold text-gradient">{portfolioData.stats.yearsExperience}</div>
-                                <div className="text-sm text-gray-500 mt-1">Experience</div>
-                            </div>
-                            <div>
-                                <div className="text-3xl font-bold text-gradient">{portfolioData.stats.happyClients}</div>
-                                <div className="text-sm text-gray-500 mt-1">Clients</div>
-                            </div>
-                            <div>
-                                <div className="text-3xl font-bold text-gradient">{portfolioData.stats.technologies}</div>
-                                <div className="text-sm text-gray-500 mt-1">Technologies</div>
-                            </div>
+                            {stats.map((stat, idx) => (
+                                <div key={stat._id || idx}>
+                                    <div className="text-3xl font-bold text-gradient">{stat.value}</div>
+                                    <div className="text-sm text-gray-500 mt-1 uppercase tracking-wider">{stat.label}</div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
@@ -91,7 +166,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* About Preview Section */}
+            {/* About Preview Section with Skills */}
             <section className="py-20 bg-dark-800/50">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -101,7 +176,7 @@ const Home = () => {
                             </h2>
                             <p className="text-lg text-gray-400 leading-relaxed">
                                 I am passionate about crafting intuitive and visually appealing user
-                                experiences that leave a lasting impact. With five years of experience
+                                experiences that leave a lasting impact. With my experience
                                 in the industry, I have honed my skills in translating complex ideas
                                 into delightful, user-centric designs.
                             </p>
@@ -112,6 +187,29 @@ const Home = () => {
                                 Learn More About Me
                                 <HiArrowRight />
                             </Link>
+
+                            <div className="pt-8">
+                                <h3 className="text-xl font-bold mb-4">Core Skills</h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {skills.map((skill, index) => (
+                                        <span
+                                            key={skill._id || index}
+                                            className="px-4 py-2 bg-dark-900 border border-white/10 rounded-lg text-sm transition-all hover:border-primary/50 flex items-center gap-2"
+                                        >
+                                            {skill.image && !skill.image.startsWith('http') && <i className={`${skill.image} text-primary`}></i>}
+                                            {skill.image && skill.image.startsWith('http') && <img src={skill.image} alt="" className="w-4 h-4 object-contain" />}
+                                            {skill.name}
+                                        </span>
+                                    ))}
+                                    {skills.length === 0 && (
+                                        <>
+                                            <span className="px-4 py-2 bg-dark-900 border border-white/10 rounded-lg text-sm">React</span>
+                                            <span className="px-4 py-2 bg-dark-900 border border-white/10 rounded-lg text-sm">Node.js</span>
+                                            <span className="px-4 py-2 bg-dark-900 border border-white/10 rounded-lg text-sm">MongoDB</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -146,10 +244,10 @@ const Home = () => {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8">
-                        {portfolioData.projects.filter(p => p.featured).map((project, index) => (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {featuredProjects.map((project, index) => (
                             <div
-                                key={project.id}
+                                key={project._id || project.id}
                                 className="group relative bg-dark-800 rounded-2xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300"
                                 style={{ animationDelay: `${index * 100}ms` }}
                             >
@@ -159,7 +257,7 @@ const Home = () => {
                                         alt={project.title}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/50 to-transparent"></div>
+                                    <div className="absolute inset-0 bg-linear-to-t from-dark-900 via-dark-900/50 to-transparent"></div>
                                 </div>
 
                                 <div className="p-6">
@@ -168,7 +266,7 @@ const Home = () => {
                                     <p className="text-gray-400 mb-4 line-clamp-2">{project.description}</p>
 
                                     <div className="flex flex-wrap gap-2 mb-4">
-                                        {project.tech.slice(0, 3).map((tech) => (
+                                        {Array.isArray(project.tech) && project.tech.slice(0, 3).map((tech) => (
                                             <span
                                                 key={tech}
                                                 className="px-3 py-1 text-xs bg-white/5 border border-white/10 rounded-full"
@@ -203,7 +301,7 @@ const Home = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 bg-gradient-to-r from-primary/10 to-green-400/10">
+            <section className="py-20 bg-linear-to-r from-primary/10 to-green-400/10">
                 <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
                     <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
                         Let's Work <span className="text-gradient">Together</span>
@@ -213,7 +311,7 @@ const Home = () => {
                     </p>
                     <Link
                         to="/contact"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-green-400 text-dark-900 font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-primary to-green-400 text-dark-900 font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
                     >
                         Start a Project
                         <HiArrowRight />
@@ -225,3 +323,4 @@ const Home = () => {
 }
 
 export default Home
+

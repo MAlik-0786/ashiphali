@@ -1,24 +1,99 @@
+import { useState, useEffect } from 'react'
 import { HiCode, HiDatabase, HiCog } from 'react-icons/hi'
 import { portfolioData } from '../data/portfolioData'
+import api from '../utils/api'
 
 const About = () => {
+    const [skills, setSkills] = useState({
+        frontend: [],
+        backend: [],
+        tools: []
+    })
+    const [loading, setLoading] = useState(true)
+    const [experience, setExperience] = useState([])
+    const [stats, setStats] = useState([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [skillsRes, expRes, statsRes] = await Promise.all([
+                    api.get('/api/skills'),
+                    api.get('/api/experiences'),
+                    api.get('/api/stats')
+                ])
+
+                const allSkills = skillsRes.data.data
+                if (allSkills && allSkills.length > 0) {
+                    setSkills({
+                        frontend: allSkills.filter(s => s.category === 'Frontend'),
+                        backend: allSkills.filter(s => s.category === 'Backend'),
+                        tools: allSkills.filter(s => s.category === 'Tools' || s.category === 'Other')
+                    })
+                } else {
+                    setSkills({
+                        frontend: portfolioData.skills.frontend.map(s => ({ name: s })),
+                        backend: portfolioData.skills.backend.map(s => ({ name: s })),
+                        tools: portfolioData.skills.tools.map(s => ({ name: s }))
+                    })
+                }
+
+                const allExp = expRes.data.data
+                if (allExp && allExp.length > 0) {
+                    setExperience(allExp)
+                } else {
+                    setExperience([
+                        {
+                            from: "2024", to: "Present",
+                            title: "Full Stack Developer", company: "Freelance",
+                            description: "Building modern web applications using MERN stack, focusing on scalable architecture and user experience."
+                        }
+                    ])
+                }
+
+                const remoteStats = statsRes.data.data || []
+                if (remoteStats.length > 0) {
+                    setStats(remoteStats)
+                } else {
+                    setStats([
+                        { label: 'Projects Completed', value: portfolioData.stats.projectsCompleted },
+                        { label: 'Years Experience', value: portfolioData.stats.yearsExperience }
+                    ])
+                }
+            } catch (err) {
+                console.error('Error fetching about data:', err)
+                setSkills({
+                    frontend: portfolioData.skills.frontend.map(s => ({ name: s })),
+                    backend: portfolioData.skills.backend.map(s => ({ name: s })),
+                    tools: portfolioData.skills.tools.map(s => ({ name: s }))
+                })
+                setStats([
+                    { label: 'Projects Completed', value: portfolioData.stats.projectsCompleted },
+                    { label: 'Years Experience', value: portfolioData.stats.yearsExperience }
+                ])
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
     const skillCategories = [
         {
             title: "Frontend Development",
             icon: HiCode,
-            skills: portfolioData.skills.frontend,
+            skills: skills.frontend,
             color: "from-blue-500 to-cyan-500"
         },
         {
             title: "Backend Development",
             icon: HiDatabase,
-            skills: portfolioData.skills.backend,
+            skills: skills.backend,
             color: "from-green-500 to-emerald-500"
         },
         {
             title: "Tools & Others",
             icon: HiCog,
-            skills: portfolioData.skills.tools,
+            skills: skills.tools,
             color: "from-purple-500 to-pink-500"
         }
     ]
@@ -33,9 +108,9 @@ const About = () => {
                         <div className="relative animate-fade-in">
                             <div className="relative z-10">
                                 <img
-                                    src="/images/workspace.png"
+                                    src="/images/hero.png"
                                     alt="Workspace"
-                                    className="w-full h-auto rounded-2xl shadow-2xl"
+                                    className="w-full h-auto rounded-2xl shadow-2xl scale-x-[-1]"
                                 />
                                 {/* Decorative Elements */}
                                 <div className="absolute -top-4 -right-4 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
@@ -70,18 +145,14 @@ const About = () => {
 
                             {/* Quick Stats */}
                             <div className="grid grid-cols-2 gap-6 pt-6">
-                                <div className="p-4 bg-dark-800 rounded-xl border border-white/10">
-                                    <div className="text-3xl font-bold text-gradient mb-1">
-                                        {portfolioData.stats.projectsCompleted}
+                                {stats.slice(0, 2).map((stat, idx) => (
+                                    <div key={stat._id || idx} className="p-4 bg-dark-800 rounded-xl border border-white/10">
+                                        <div className="text-3xl font-bold text-gradient mb-1">
+                                            {stat.value}
+                                        </div>
+                                        <div className="text-sm text-gray-500 uppercase tracking-wider">{stat.label}</div>
                                     </div>
-                                    <div className="text-sm text-gray-500">Projects Completed</div>
-                                </div>
-                                <div className="p-4 bg-dark-800 rounded-xl border border-white/10">
-                                    <div className="text-3xl font-bold text-gradient mb-1">
-                                        {portfolioData.stats.yearsExperience}
-                                    </div>
-                                    <div className="text-sm text-gray-500">Years Experience</div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -107,7 +178,7 @@ const About = () => {
                                 className="group p-8 bg-dark-900 border border-white/10 rounded-2xl hover:border-primary/50 transition-all duration-300 animate-fade-in"
                                 style={{ animationDelay: `${index * 100}ms` }}
                             >
-                                <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${category.color} p-0.5 mb-6`}>
+                                <div className={`w-16 h-16 rounded-xl bg-linear-to-br ${category.color} p-0.5 mb-6`}>
                                     <div className="w-full h-full bg-dark-900 rounded-xl flex items-center justify-center">
                                         <category.icon className="text-3xl text-white" />
                                     </div>
@@ -116,13 +187,21 @@ const About = () => {
                                 <h3 className="text-2xl font-bold mb-6">{category.title}</h3>
 
                                 <div className="flex flex-wrap gap-2">
-                                    {category.skills.map((skill) => (
-                                        <span
-                                            key={skill}
-                                            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
-                                        >
-                                            {skill}
-                                        </span>
+                                    {category.skills.map((skill, sIndex) => (
+                                        <div key={skill._id || sIndex} className="relative group/skill">
+                                            <span
+                                                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 flex items-center gap-2"
+                                            >
+                                                {skill.image && !skill.image.startsWith('http') && <i className={`${skill.image} text-white`}></i>}
+                                                {skill.image && skill.image.startsWith('http') && <img src={skill.image} alt="" className="w-4 h-4 object-contain" />}
+                                                {skill.name}
+                                            </span>
+                                            {skill.level > 0 && (
+                                                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-dark-900 text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/skill:opacity-100 transition-opacity whitespace-nowrap">
+                                                    Level: {skill.level}%
+                                                </div>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             </div>
@@ -144,36 +223,20 @@ const About = () => {
                     </div>
 
                     <div className="space-y-8">
-                        {[
-                            {
-                                year: "2024 - Present",
-                                title: "Full Stack Developer",
-                                company: "Freelance",
-                                description: "Building modern web applications using MERN stack, focusing on scalable architecture and user experience."
-                            },
-                            {
-                                year: "2023 - 2024",
-                                title: "Frontend Developer",
-                                company: "Tech Startup",
-                                description: "Developed responsive web applications with React.js and implemented modern UI/UX designs."
-                            },
-                            {
-                                year: "2021 - 2023",
-                                title: "Junior Developer",
-                                company: "Digital Agency",
-                                description: "Started my journey in web development, learning full-stack technologies and best practices."
-                            }
-                        ].map((item, index) => (
+                        {experience.map((item, index) => (
                             <div
-                                key={index}
+                                key={item._id || index}
                                 className="relative pl-8 border-l-2 border-white/10 hover:border-primary/50 transition-all duration-300 animate-fade-in"
                                 style={{ animationDelay: `${index * 100}ms` }}
                             >
                                 <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-primary"></div>
                                 <div className="pb-8">
-                                    <div className="text-sm text-primary font-semibold mb-2">{item.year}</div>
+                                    <div className="text-sm text-primary font-semibold mb-2">
+                                        {item.from} - {item.to}
+                                    </div>
                                     <h3 className="text-2xl font-bold mb-1">{item.title}</h3>
                                     <div className="text-gray-400 mb-3">{item.company}</div>
+                                    {item.location && <div className="text-gray-500 text-xs mb-2 italic">{item.location}</div>}
                                     <p className="text-gray-500">{item.description}</p>
                                 </div>
                             </div>
@@ -183,7 +246,7 @@ const About = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 bg-gradient-to-r from-primary/10 to-green-400/10">
+            <section className="py-20 bg-linear-to-r from-primary/10 to-green-400/10">
                 <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
                     <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
                         Let's Create Something <span className="text-gradient">Amazing</span>
@@ -193,7 +256,7 @@ const About = () => {
                     </p>
                     <a
                         href="/contact"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-green-400 text-dark-900 font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-primary to-green-400 text-dark-900 font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
                     >
                         Get In Touch
                     </a>

@@ -14,7 +14,7 @@ const Footer = () => {
                         <Link to="/" className="inline-block mb-6">
                             <h2 className="text-3xl font-display font-bold">
                                 Ashiph<br />
-                                <span className="text-white">Ali</span>
+                                <span className="text-green-500">Ali</span>
                             </h2>
                         </Link>
                         <p className="text-gray-400 max-w-sm mb-6">
@@ -31,7 +31,6 @@ const Footer = () => {
                             <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">About</Link></li>
                             <li><Link to="/projects" className="text-gray-400 hover:text-white transition-colors">Work</Link></li>
                             <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
-                            <li><Link to="/admin" className="text-gray-400 hover:text-white transition-colors">Hire Me</Link></li>
                         </ul>
                     </div>
 
@@ -69,16 +68,7 @@ const Footer = () => {
                                     Twitter
                                 </a>
                             </li>
-                            <li>
-                                <a
-                                    href={portfolioData.social.instagram}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-                                >
-                                    Instagram
-                                </a>
-                            </li>
+
                         </ul>
                     </div>
                 </div>

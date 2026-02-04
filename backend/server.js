@@ -4,6 +4,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import contactRoutes from './routes/contactRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
+import skillRoutes from './routes/skillRoutes.js';
+import experienceRoutes from './routes/experienceRoutes.js';
+import statRoutes from './routes/statRoutes.js';
 
 dotenv.config();
 
@@ -20,15 +25,20 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('✅ MongoDB Connected Successfully'))
-.catch((err) => console.error('❌ MongoDB Connection Error:', err));
+  .then(() => console.log('✅ MongoDB Connected Successfully'))
+  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
 // Routes
 app.use('/api/contacts', contactRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/skills', skillRoutes);
+app.use('/api/experiences', experienceRoutes);
+app.use('/api/stats', statRoutes);
 
 // Health Check
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'Portfolio Contact API is running',
     status: 'active',
     timestamp: new Date().toISOString()
@@ -38,9 +48,9 @@ app.get('/', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     error: 'Something went wrong!',
-    message: err.message 
+    message: err.message
   });
 });
 

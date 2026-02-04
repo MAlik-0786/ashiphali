@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
     const location = useLocation()
 
     useEffect(() => {
@@ -17,14 +18,14 @@ const Header = () => {
 
     useEffect(() => {
         setIsMenuOpen(false)
+        setIsLoggedIn(!!localStorage.getItem('token'))
     }, [location])
 
     const navLinks = [
         { path: '/', label: 'Home' },
         { path: '/about', label: 'About' },
         { path: '/projects', label: 'Work' },
-        { path: '/contact', label: 'Blog' },
-        { path: '/admin', label: 'Hire me' }
+        { path: '/contact', label: 'Contact' }
     ]
 
     return (
@@ -44,8 +45,8 @@ const Header = () => {
                                 key={link.path}
                                 to={link.path}
                                 className={`relative text-sm font-medium transition-colors duration-200 ${location.pathname === link.path
-                                        ? 'text-primary'
-                                        : 'text-gray-400 hover:text-white'
+                                    ? 'text-primary'
+                                    : 'text-gray-400 hover:text-white'
                                     }`}
                             >
                                 {link.label}
@@ -54,6 +55,22 @@ const Header = () => {
                                 )}
                             </Link>
                         ))}
+
+                        {isLoggedIn ? (
+                            <Link
+                                to="/admin"
+                                className="px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold hover:bg-primary hover:text-dark-900 transition-all duration-300"
+                            >
+                                Dashboard
+                            </Link>
+                        ) : (
+                            <Link
+                                to="/login"
+                                className="px-5 py-2 rounded-full border border-white/10 text-gray-400 text-sm font-semibold hover:border-primary hover:text-primary transition-all duration-300"
+                            >
+                                Login
+                            </Link>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -75,13 +92,19 @@ const Header = () => {
                                 key={link.path}
                                 to={link.path}
                                 className={`block text-lg font-medium transition-colors duration-200 ${location.pathname === link.path
-                                        ? 'text-primary'
-                                        : 'text-gray-400 hover:text-white'
+                                    ? 'text-primary'
+                                    : 'text-gray-400 hover:text-white'
                                     }`}
                             >
                                 {link.label}
                             </Link>
                         ))}
+                        <Link
+                            to={isLoggedIn ? "/admin" : "/login"}
+                            className="block text-lg font-medium text-primary"
+                        >
+                            {isLoggedIn ? "Dashboard" : "Admin Login"}
+                        </Link>
                     </div>
                 </div>
             </div>

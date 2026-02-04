@@ -1,17 +1,48 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { HiArrowRight, HiExternalLink, HiCode } from 'react-icons/hi'
-import { portfolioData } from '../data/portfolioData'
+import api from '../utils/api'
+import { portfolioData } from '../data/portfolioData' // Fallback if needed
 
 const Projects = () => {
+    const [projects, setProjects] = useState([])
+    const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState('All')
 
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const res = await api.get('/api/projects')
+                if (res.data.data && res.data.data.length > 0) {
+                    setProjects(res.data.data)
+                } else {
+                    // Fallback to static data if no projects in DB yet
+                    setProjects(portfolioData.projects)
+                }
+            } catch (err) {
+                console.error(err)
+                setProjects(portfolioData.projects)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchProjects()
+    }, [])
+
     // Get unique categories
-    const categories = ['All', ...new Set(portfolioData.projects.map(p => p.category))]
+    const categories = ['All', ...new Set(projects.map(p => p.category))]
 
     // Filter projects
     const filteredProjects = filter === 'All'
-        ? portfolioData.projects
-        : portfolioData.projects.filter(p => p.category === filter)
+        ? projects
+        : projects.filter(p => p.category === filter)
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="spinner w-12 h-12"></div>
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-screen pt-20">
@@ -34,8 +65,8 @@ const Projects = () => {
                             key={cat}
                             onClick={() => setFilter(cat)}
                             className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${filter === cat
-                                    ? 'bg-primary text-dark-900 border-primary'
-                                    : 'bg-transparent text-gray-400 border-white/10 hover:border-primary/50 hover:text-white'
+                                ? 'bg-primary text-dark-900 border-primary'
+                                : 'bg-transparent text-gray-400 border-white/10 hover:border-primary/50 hover:text-white'
                                 }`}
                         >
                             {cat}
@@ -47,7 +78,7 @@ const Projects = () => {
                 <div className="space-y-32">
                     {filteredProjects.map((project, index) => (
                         <div
-                            key={project.id}
+                            key={project._id || project.id}
                             className={`flex flex-col lg:flex-row gap-12 lg:gap-20 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''
                                 } animate-fade-in`}
                         >
@@ -63,7 +94,7 @@ const Projects = () => {
 
                                     {/* Overlay Links */}
                                     <div className="absolute inset-0 z-20 flex items-center justify-center gap-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-dark-900/80 backdrop-blur-sm">
-                                        {project.link !== '#' && (
+                                        {project.link !== '#' && project.link && (
                                             <a
                                                 href={project.link}
                                                 target="_blank"
@@ -74,15 +105,17 @@ const Projects = () => {
                                                 <HiExternalLink size={24} />
                                             </a>
                                         )}
-                                        <a
-                                            href={project.github}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="p-4 bg-white text-dark-900 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 hover:scale-110"
-                                            title="View Code"
-                                        >
-                                            <HiCode size={24} />
-                                        </a>
+                                        {project.github && (
+                                            <a
+                                                href={project.github}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="p-4 bg-white text-dark-900 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 hover:scale-110"
+                                                title="View Code"
+                                            >
+                                                <HiCode size={24} />
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
 
@@ -105,7 +138,7 @@ const Projects = () => {
                                 </p>
 
                                 <div className="flex flex-wrap gap-3 pt-4">
-                                    {project.tech.map((tech) => (
+                                    {Array.isArray(project.tech) && project.tech.map((tech) => (
                                         <span
                                             key={tech}
                                             className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 hover:border-primary/30 transition-colors"
@@ -113,17 +146,6 @@ const Projects = () => {
                                             {tech}
                                         </span>
                                     ))}
-                                </div>
-
-                                <div className="pt-6">
-                                    <a
-                                        href={project.link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group inline-flex items-center gap-2 text-primary font-semibold hover:gap-4 transition-all duration-300"
-                                    >
-                                        View Case Study <HiArrowRight />
-                                    </a>
                                 </div>
                             </div>
                         </div>
