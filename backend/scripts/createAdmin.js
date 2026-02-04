@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import User from '../models/User.js';
 
-dotenv.config(); // Adjust path based on execution location
+dotenv.config({ path: '../.env' });
 
 const createAdmin = async () => {
     try {
@@ -10,23 +10,26 @@ const createAdmin = async () => {
         console.log(`MongoDB Connected: ${conn.connection.host}`);
 
         // Check if admin exists
-        const userExists = await User.findOne({ email: 'admin@example.com' });
+        const email = process.env.ADMIN_EMAIL || 'ashiph@ali.com';
+        const password = process.env.ADMIN_PASSWORD || 'aliadminashiph123';
+
+        const userExists = await User.findOne({ email });
 
         if (userExists) {
-            console.log('Admin user already exists');
+            console.log(`Admin user ${email} already exists`);
             process.exit(0);
         }
 
         // Create admin user
         const user = await User.create({
-            email: 'admin@example.com',
-            password: 'password123',
+            email,
+            password,
             role: 'admin'
         });
 
-        console.log('Presidio Admin User Created!');
-        console.log('Email: admin@example.com');
-        console.log('Password: password123');
+        console.log('Admin User Created Successfully!');
+        console.log(`Email: ${email}`);
+        console.log('Password: [HIDDEN]');
         process.exit(0);
     } catch (err) {
         console.error(err);
