@@ -38,7 +38,14 @@ const Contact = () => {
             }
         } catch (error) {
             console.error('Error:', error)
-            toast.error('Failed to send message. Please try again.')
+            const validationErrors = error.response?.data?.errors
+            const errorMessage = error.response?.data?.message || 'Failed to send message. Please try again.'
+
+            if (validationErrors && validationErrors.length > 0) {
+                validationErrors.forEach(err => toast.error(err))
+            } else {
+                toast.error(errorMessage)
+            }
         } finally {
             setLoading(false)
         }
@@ -145,6 +152,7 @@ const Contact = () => {
                                     value={formData.message}
                                     onChange={handleChange}
                                     required
+                                    minLength={10}
                                     rows="4"
                                     className="w-full bg-transparent border-b border-white/20 py-4 text-lg focus:outline-none focus:border-primary transition-colors resize-none"
                                     placeholder="Tell me about your project..."
