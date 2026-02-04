@@ -26,9 +26,9 @@ const Admin = () => {
         setLoading(true)
         try {
             const response = await axios.get('/api/contacts')
-            setContacts(response.data.data.contacts)
+            const allContacts = response.data.data || []
+            setContacts(allContacts)
 
-            const allContacts = response.data.data.contacts
             setStats({
                 total: allContacts.length,
                 new: allContacts.filter(c => c.status === 'new').length,
@@ -133,8 +133,8 @@ const Admin = () => {
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm capitalize transition-all duration-300 ${filter === f
-                                        ? 'bg-primary text-dark-900 font-semibold'
-                                        : 'bg-dark-800 text-gray-400 hover:text-white'
+                                    ? 'bg-primary text-dark-900 font-semibold'
+                                    : 'bg-dark-800 text-gray-400 hover:text-white'
                                     }`}
                             >
                                 {f}
