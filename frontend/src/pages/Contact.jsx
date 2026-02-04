@@ -5,9 +5,12 @@ import axios from 'axios'
 import { portfolioData } from '../data/portfolioData'
 
 const Contact = () => {
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        phone: '',
+        subject: '',
         message: ''
     })
     const [loading, setLoading] = useState(false)
@@ -22,10 +25,7 @@ const Contact = () => {
 
         try {
             // Simulate API call format or actual endpoint
-            const response = await axios.post('/api/contacts', {
-                ...formData,
-                subject: 'Portfolio Contact' // Default subject
-            })
+            const response = await axios.post('/api/contacts', formData)
 
             if (response.data.success) {
                 toast.success(
@@ -34,7 +34,7 @@ const Contact = () => {
                         <span>Message sent successfully!</span>
                     </div>
                 )
-                setFormData({ name: '', email: '', message: '' })
+                setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
             }
         } catch (error) {
             console.error('Error:', error)
@@ -73,11 +73,11 @@ const Contact = () => {
                     {/* Left Column: Image & Info */}
                     <div className="space-y-12 animate-slide-in">
                         <div className="relative">
-                            <div className="aspect-[4/5] bg-dark-800 rounded-none overflow-hidden grayscale hover:grayscale-0 transition-all duration-700">
+                            <div className="aspect-4/5 bg-dark-800 rounded-none overflow-hidden grayscale hover:grayscale-0 transition-all duration-700">
                                 <img
                                     src="/images/hero.png"
                                     alt="Ashiph Ali"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover scale-x-[-1]"
                                 />
                             </div>
                             {/* Decorative Frame */}
@@ -143,6 +143,33 @@ const Contact = () => {
                                     className="w-full bg-transparent border-b border-white/20 py-4 text-lg focus:outline-none focus:border-primary transition-colors"
                                     placeholder="john@example.com"
                                 />
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-8">
+                                <div className="group">
+                                    <label className="block text-sm text-gray-500 mb-2 group-focus-within:text-primary transition-colors">Phone number</label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        className="w-full bg-transparent border-b border-white/20 py-4 text-lg focus:outline-none focus:border-primary transition-colors"
+                                        placeholder="+91 12345 67890"
+                                    />
+                                </div>
+
+                                <div className="group">
+                                    <label className="block text-sm text-gray-500 mb-2 group-focus-within:text-primary transition-colors">Subject</label>
+                                    <input
+                                        type="text"
+                                        name="subject"
+                                        value={formData.subject}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full bg-transparent border-b border-white/20 py-4 text-lg focus:outline-none focus:border-primary transition-colors"
+                                        placeholder="Project Inquiry"
+                                    />
+                                </div>
                             </div>
 
                             <div className="group">

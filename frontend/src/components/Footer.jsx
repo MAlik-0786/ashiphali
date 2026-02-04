@@ -13,8 +13,8 @@ const Footer = () => {
                     <div className="col-span-1 md:col-span-2">
                         <Link to="/" className="inline-block mb-6">
                             <h2 className="text-3xl font-display font-bold">
-                                Ashiph<br />
-                                <span className="text-green-500">Ali</span>
+                                𝓐𝓼𝓱𝓲𝓹𝓱<br />
+                                <span className="text-green-500">𝓪𝓵𝓲</span>
                             </h2>
                         </Link>
                         <p className="text-gray-400 max-w-sm mb-6">

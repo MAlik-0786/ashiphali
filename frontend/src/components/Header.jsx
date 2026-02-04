@@ -34,8 +34,8 @@ const Header = () => {
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 <nav className="flex items-center justify-between py-5">
                     <Link to="/" className="font-display text-2xl font-bold group">
-                        <span className="text-white">Ashiph</span>
-                        <span className="text-gradient ml-1">Ali</span>
+                        <span className="text-white">𝓐𝓼𝓱𝓲𝓹𝓱</span>
+                        <span className="text-gradient ml-1">𝓪𝓵𝓲</span>
                     </Link>
 
                     {/* Desktop Navigation */}

@@ -17,6 +17,7 @@ import StatManager from '../components/admin/StatManager';
 import api from '../utils/api';
 
 const Admin = () => {
+    window.scrollTo(0, 0);
     const [activeTab, setActiveTab] = useState('contacts');
     const [user, setUser] = useState(null);
     const navigate = useNavigate();

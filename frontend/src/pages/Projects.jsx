@@ -4,6 +4,7 @@ import api from '../utils/api'
 import { portfolioData } from '../data/portfolioData' // Fallback if needed
 
 const Projects = () => {
+
     const [projects, setProjects] = useState([])
     const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState('All')
@@ -158,7 +159,7 @@ const Projects = () => {
                 <div className="text-center">
                     <h2 className="text-3xl font-display font-bold mb-6">Want to see more?</h2>
                     <a
-                        href="https://github.com/ashiphali"
+                        href="https://github.com/MAlik-0786"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all duration-300"

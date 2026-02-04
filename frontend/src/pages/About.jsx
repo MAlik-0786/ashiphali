@@ -4,6 +4,7 @@ import { portfolioData } from '../data/portfolioData'
 import api from '../utils/api'
 
 const About = () => {
+    window.scrollTo(0, 0);
     const [skills, setSkills] = useState({
         frontend: [],
         backend: [],

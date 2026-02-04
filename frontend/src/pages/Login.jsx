@@ -5,6 +5,7 @@ import api from '../utils/api';
 import { HiLockClosed } from 'react-icons/hi';
 
 const Login = () => {
+    window.scrollTo(0, 0);
     const [formData, setFormData] = useState({
         email: '',
         password: ''

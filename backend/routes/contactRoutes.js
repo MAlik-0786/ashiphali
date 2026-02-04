@@ -1,5 +1,6 @@
 import express from 'express';
 import Contact from '../models/Contact.js';
+import sendEmail from '../utils/sendEmail.js';
 
 const router = express.Router();
 
@@ -26,6 +27,37 @@ router.post('/', async (req, res) => {
         });
 
         const savedContact = await newContact.save();
+
+        // Send Email Notification to Admin
+        try {
+            const adminEmail = process.env.EMAIL_USER || 'malikasiph786@gmail.com';
+            const emailHtml = `
+                <div style="font-family: sans-serif; padding: 20px; color: #333; background-color: #f4f4f4;">
+                    <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; border: 1px solid #ddd;">
+                        <h2 style="color: #008037; border-bottom: 2px solid #008037; padding-bottom: 10px;">New Contact Submission</h2>
+                        <p><strong>Name:</strong> ${name}</p>
+                        <p><strong>Email:</strong> ${email}</p>
+                        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+                        <p><strong>Subject:</strong> ${subject || 'No Subject'}</p>
+                        <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-left: 4px solid #008037;">
+                            <p style="margin: 0;"><strong>Message:</strong></p>
+                            <p style="margin-top: 10px; line-height: 1.6;">${message}</p>
+                        </div>
+                        <p style="margin-top: 20px; font-size: 12px; color: #888;">Submission ID: ${savedContact._id}</p>
+                    </div>
+                </div>
+            `;
+
+            await sendEmail({
+                to: adminEmail,
+                subject: `🚀 New Portfolio Message: ${subject || 'New Contact'}`,
+                html: emailHtml
+            });
+            console.log('✅ Admin Notification Email Sent');
+        } catch (emailErr) {
+            console.error('❌ Email notification failed:', emailErr.message);
+            // We don't want to fail the whole request if only email fails
+        }
 
         res.status(201).json({
             success: true,

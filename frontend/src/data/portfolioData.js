@@ -4,11 +4,11 @@ export const portfolioData = {
         name: "Ashiph Ali",
         title: "Digital Product Designer",
         subtitle: "Full Stack Developer",
-        tagline: "I am passionate about crafting intuitive and visually appealing user experiences that leave a lasting impact.",
+        tagline: "hey there! i'am Ashiph Ali, a full stack developer and a digital product designer. I am passionate about crafting intuitive and visually appealing user experiences that leave a lasting impact.",
         experience: "I have honed my skills in translating complex ideas into delightful, user-centric designs.",
         email: "malikasiph786@gmail.com",
         phone: "+91 9889858173",
-        location: "India",
+        location: "India, Delhi",
     },
 
     skills: {
@@ -24,7 +24,8 @@ export const portfolioData = {
             "SQL",
             "Node.js",
             "Express.js",
-            "MongoDB"
+            "MongoDB",
+
         ],
         tools: [
             "Git",
@@ -33,7 +34,8 @@ export const portfolioData = {
             "Canvas",
             "Agile",
             "Jira",
-            "MERN Stack"
+            "Scrum",
+
         ]
     },
 

@@ -5,6 +5,7 @@ import { portfolioData } from '../data/portfolioData'
 import api from '../utils/api'
 
 const Home = () => {
+    window.scrollTo(0, 0);
     const [featuredProjects, setFeaturedProjects] = useState([])
     const [skills, setSkills] = useState([])
     const [stats, setStats] = useState([])
