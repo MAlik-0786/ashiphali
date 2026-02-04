@@ -37,7 +37,6 @@ const Contact = () => {
                 setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
             }
         } catch (error) {
-            console.error('Error:', error)
             const validationErrors = error.response?.data?.errors
             const errorMessage = error.response?.data?.message || 'Failed to send message. Please try again.'
 

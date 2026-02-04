@@ -53,9 +53,7 @@ router.post('/', async (req, res) => {
                 subject: `🚀 New Portfolio Message: ${subject || 'New Contact'}`,
                 html: emailHtml
             });
-            console.log('✅ Admin Notification Email Sent');
         } catch (emailErr) {
-            console.error('❌ Email notification failed:', emailErr.message);
             // We don't want to fail the whole request if only email fails
         }
 
@@ -70,7 +68,6 @@ router.post('/', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error saving contact:', error);
 
         if (error.name === 'ValidationError') {
             const errors = Object.values(error.errors).map(err => err.message);
@@ -143,7 +140,6 @@ router.get('/:id', async (req, res) => {
             data: contact
         });
     } catch (error) {
-        console.error('Error fetching contact:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to fetch contact'
@@ -184,7 +180,6 @@ router.patch('/:id/status', async (req, res) => {
             data: contact
         });
     } catch (error) {
-        console.error('Error updating status:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to update status'
@@ -211,7 +206,6 @@ router.delete('/:id', async (req, res) => {
             message: 'Contact deleted successfully'
         });
     } catch (error) {
-        console.error('Error deleting contact:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to delete contact'
@@ -241,7 +235,6 @@ router.get('/stats/summary', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching stats:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to fetch statistics'

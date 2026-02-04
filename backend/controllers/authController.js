@@ -69,6 +69,42 @@ export const getMe = async (req, res, next) => {
     }
 };
 
+// @desc    Setup initial admin
+// @route   GET /api/auth/setup-admin
+// @access  Public
+export const setupAdmin = async (req, res, next) => {
+    try {
+        const email = process.env.ADMIN_EMAIL || 'ashiph@ali.com';
+        const password = process.env.ADMIN_PASSWORD || 'aliadminashiph123';
+
+        const userExists = await User.findOne({ email });
+
+        if (userExists) {
+            return res.status(400).json({
+                success: false,
+                message: 'Admin already exists'
+            });
+        }
+
+        const user = await User.create({
+            email,
+            password,
+            role: 'admin'
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Admin created successfully',
+            data: {
+                email: user.email,
+                role: user.role
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
     // Create token

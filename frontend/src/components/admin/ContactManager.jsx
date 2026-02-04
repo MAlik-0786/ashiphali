@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+
 import api from '../../utils/api' // Use api instance for auth headers
 import { toast } from 'react-toastify'
 import {
@@ -40,7 +40,6 @@ const ContactManager = () => {
             })
         } catch (error) {
             toast.error('Failed to load contacts')
-            console.error(error)
         } finally {
             setLoading(false)
         }

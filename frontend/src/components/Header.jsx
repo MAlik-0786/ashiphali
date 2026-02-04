@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { HiMenu, HiX } from 'react-icons/hi'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -21,12 +21,12 @@ const Header = () => {
         setIsLoggedIn(!!localStorage.getItem('token'))
     }, [location])
 
-    const navLinks = [
+    const navLinks = useMemo(() => [
         { path: '/', label: 'Home' },
         { path: '/about', label: 'About' },
         { path: '/projects', label: 'Work' },
         { path: '/contact', label: 'Contact' }
-    ]
+    ], [])
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-dark-900/80 backdrop-blur-md border-b border-dark-600' : 'bg-transparent'
@@ -51,7 +51,8 @@ const Header = () => {
                             >
                                 {link.label}
                                 {location.pathname === link.path && (
-                                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-green-400"></span>
+                                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-linear-to-r from-primary to-green-400"></span>
+
                                 )}
                             </Link>
                         ))}

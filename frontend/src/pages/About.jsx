@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { HiCode, HiDatabase, HiCog } from 'react-icons/hi'
 import { portfolioData } from '../data/portfolioData'
 import api from '../utils/api'
@@ -61,7 +61,6 @@ const About = () => {
                     ])
                 }
             } catch (err) {
-                console.error('Error fetching about data:', err)
                 setSkills({
                     frontend: portfolioData.skills.frontend.map(s => ({ name: s })),
                     backend: portfolioData.skills.backend.map(s => ({ name: s })),
@@ -78,7 +77,7 @@ const About = () => {
         fetchData()
     }, [])
 
-    const skillCategories = [
+    const skillCategories = useMemo(() => [
         {
             title: "Frontend Development",
             icon: HiCode,
@@ -97,7 +96,7 @@ const About = () => {
             skills: skills.tools,
             color: "from-purple-500 to-pink-500"
         }
-    ]
+    ], [skills])
 
     return (
         <div className="min-h-screen pt-20">

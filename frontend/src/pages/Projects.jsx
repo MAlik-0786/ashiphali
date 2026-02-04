@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { HiArrowRight, HiExternalLink, HiCode } from 'react-icons/hi'
 import api from '../utils/api'
 import { portfolioData } from '../data/portfolioData' // Fallback if needed
@@ -20,7 +20,6 @@ const Projects = () => {
                     setProjects(portfolioData.projects)
                 }
             } catch (err) {
-                console.error(err)
                 setProjects(portfolioData.projects)
             } finally {
                 setLoading(false)
@@ -29,13 +28,17 @@ const Projects = () => {
         fetchProjects()
     }, [])
 
-    // Get unique categories
-    const categories = ['All', ...new Set(projects.map(p => p.category))]
+    // Get unique categories - memoized
+    const categories = useMemo(() => {
+        return ['All', ...new Set(projects.map(p => p.category))]
+    }, [projects])
 
-    // Filter projects
-    const filteredProjects = filter === 'All'
-        ? projects
-        : projects.filter(p => p.category === filter)
+    // Filter projects - memoized
+    const filteredProjects = useMemo(() => {
+        return filter === 'All'
+            ? projects
+            : projects.filter(p => p.category === filter)
+    }, [projects, filter])
 
     if (loading) {
         return (

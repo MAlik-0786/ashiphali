@@ -69,7 +69,6 @@ const Home = () => {
                     ])
                 }
             } catch (err) {
-                console.error('Error fetching home data:', err)
                 // Fallback to static data
                 setFeaturedProjects(portfolioData.projects.slice(0, 3))
                 const staticSkills = portfolioData.projects.flatMap(p => p.tech || [])

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     HiLogout,
@@ -9,11 +9,11 @@ import {
     HiBriefcase,
     HiChartBar
 } from 'react-icons/hi';
-import ContactManager from '../components/admin/ContactManager';
-import ProjectManager from '../components/admin/ProjectManager';
-import SkillManager from '../components/admin/SkillManager';
-import ExperienceManager from '../components/admin/ExperienceManager';
-import StatManager from '../components/admin/StatManager';
+const ContactManager = lazy(() => import('../components/admin/ContactManager'));
+const ProjectManager = lazy(() => import('../components/admin/ProjectManager'));
+const SkillManager = lazy(() => import('../components/admin/SkillManager'));
+const ExperienceManager = lazy(() => import('../components/admin/ExperienceManager'));
+const StatManager = lazy(() => import('../components/admin/StatManager'));
 import api from '../utils/api';
 
 const Admin = () => {
@@ -119,12 +119,19 @@ const Admin = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="animate-fade-in">
-                {activeTab === 'contacts' && <ContactManager />}
-                {activeTab === 'projects' && <ProjectManager />}
-                {activeTab === 'skills' && <SkillManager />}
-                {activeTab === 'experience' && <ExperienceManager />}
-                {activeTab === 'stats' && <StatManager />}
+            <div className="bg-dark-900 border border-white/10 rounded-2xl p-6 min-h-[500px] animate-fade-in shadow-2xl relative overflow-hidden">
+                <Suspense fallback={
+                    <div className="flex flex-col items-center justify-center p-20 text-gray-500">
+                        <div className="spinner w-8 h-8 mb-4 border-primary"></div>
+                        <p>Loading manager...</p>
+                    </div>
+                }>
+                    {activeTab === 'contacts' && <ContactManager />}
+                    {activeTab === 'projects' && <ProjectManager />}
+                    {activeTab === 'skills' && <SkillManager />}
+                    {activeTab === 'experience' && <ExperienceManager />}
+                    {activeTab === 'stats' && <StatManager />}
+                </Suspense>
             </div>
         </div>
     );
