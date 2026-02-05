@@ -21,7 +21,7 @@ const portfolioData = {
             description: "An AI-powered recipe generator web application that helps users find recipes based on selected ingredients.",
             longDescription: "Cuisine is an AI-powered recipe generator web application that helps users find recipes based on selected ingredients. The frontend is built using React with a responsive and intuitive user interface.",
             tech: ["React.js", "Node.js", "Express.js", "AI API", "MongoDB"],
-            image: "https://res.cloudinary.com/dzagepohk/image/upload/v1768327606/worker-profiles/oy51n2um5mhrkusy9l9p.jpg",
+            image: "https://res.cloudinary.com/dzagepohk/image/upload/v1770276414/cuisine_yyfcz0.png",
             link: "https://cuisine-recipe.netlify.app",
             github: "https://github.com/ashiphali/cuisine",
             featured: true

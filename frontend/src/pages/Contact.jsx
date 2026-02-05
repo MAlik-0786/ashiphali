@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { HiStar, HiMail, HiPhone, HiLocationMarker } from 'react-icons/hi'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+import api from '../utils/api'
 import { portfolioData } from '../data/portfolioData'
 
 const Contact = () => {
@@ -24,8 +24,8 @@ const Contact = () => {
         setLoading(true)
 
         try {
-            // Simulate API call format or actual endpoint
-            const response = await axios.post('/api/contacts', formData)
+            // Use the api utility instead of axios
+            const response = await api.post('/api/contacts', formData)
 
             if (response.data.success) {
                 toast.success(

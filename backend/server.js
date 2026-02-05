@@ -17,11 +17,28 @@ const PORT = process.env.PORT || 5000;
 
 
 // Middleware
+// backend/server.js
+
+// Change lines 20-25 to be more flexible:
+const allowedOrigins = [
+  'http://localhost:3000',      // Local Vite port
+  'http://localhost:5173',      // Default Vite port
+  'https://ashiphali-1.onrender.com',
+  'https://ashiphali.onrender.com'
+];
+
 app.use(cors({
-  origin: '*',
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

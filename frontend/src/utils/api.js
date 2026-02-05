@@ -1,11 +1,14 @@
 import axios from 'axios';
 
+// frontend/src/utils/api.js
+
 const api = axios.create({
+    // Use the env variable if it exists, otherwise use relative path
+    baseURL: import.meta.env.VITE_API_URL || '',
     headers: {
         'Content-Type': 'application/json'
     }
 });
-
 // Add a request interceptor
 api.interceptors.request.use(
     (config) => {
