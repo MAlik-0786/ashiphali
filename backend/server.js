@@ -23,8 +23,8 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'http://localhost:3000',      // Local Vite port
   'http://localhost:5173',      // Default Vite port
-  'https://ashiphali-1.onrender.com',
-  'https://ashiphali.onrender.com'
+  'https://www.ashiphali.in',
+  'https://ashiphali-1.onrender.com'
 ];
 
 app.use(cors({
